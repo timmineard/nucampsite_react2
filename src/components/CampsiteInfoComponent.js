@@ -21,8 +21,13 @@ class CommentForm extends Component {
 		});
 	}
 	handleSubmit(values) {
-		console.log(`Current state is: ${JSON.stringify(values)}`);
-		alert(`Current state is: ${JSON.stringify(values)}`);
+		this.toggleModal();
+		this.props.addComment(
+			this.props.campsiteId,
+			values.rating,
+			values.author,
+			values.text
+		);
 	}
 	render() {
 		return (
@@ -48,42 +53,42 @@ class CommentForm extends Component {
 									<option>5</option>
 								</Control.select>
 							</div>
-							<div className="form-group">
-								<Label htmlFor="author">Your Name</Label>
+							<div className='form-group'>
+								<Label htmlFor='author'>Your Name</Label>
 								<Control.text
-								  model=".author"
-								  id="author"
-								  name="author"
-								  placeholder="Your Name"
-								  className="form-control"
-								  validators={{
-									  minLength: minLength(2),
-									  maxLength: maxLength(15),
-								  }}
+									model='.author'
+									id='author'
+									name='author'
+									placeholder='Your Name'
+									className='form-control'
+									validators={{
+										minLength: minLength(2),
+										maxLength: maxLength(15),
+									}}
 								/>
 								<Errors
-								  className="text-danger"
-								  model=".author"
-								  show="touched"
-								  component="div"
-								  messages={{
-									  minLength: "Must be at least 2 characters",
-									  maxLength: "Must be 15 characters or less",
-								  }}
+									className='text-danger'
+									model='.author'
+									show='touched'
+									component='div'
+									messages={{
+										minLength: "Must be at least 2 characters",
+										maxLength: "Must be 15 characters or less",
+									}}
 								/>
 							</div>
-							<div className="form-group">
-								<Label htmlFor="text">Comment</Label>
+							<div className='form-group'>
+								<Label htmlFor='text'>Comment</Label>
 								<Control.textarea
-								  model=".text"
-								  id="text"
-								  name="text"
-								  rows="6"
-								  className="form-control"
+									model='.text'
+									id='text'
+									name='text'
+									rows='6'
+									className='form-control'
 								/>
 							</div>
-							<div className="form-group">
-								<Button type="submit" color="primary">
+							<div className='form-group'>
+								<Button type='submit' color='primary'>
 									Submit
 								</Button>
 							</div>
@@ -108,47 +113,60 @@ function RenderCampsite({campsite}) {
 	);
 }
 
-function RenderComments({comments}) {
-	if(comments) {
+function RenderComments({ comments, addComment, campsiteId }) {
+	if (comments) {
 		return (
-			<div className="col-md-5 m-1">
+			<div className='col-md-5 m-1'>
 				<h4>Comments</h4>
-				{comments.map(comment => {
-						return (
-							<div key={comment.id}>
-								<p>{comment.text}<br />
-								-- {comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}
-								</p>
-							</div>
-						);
-				    })}
-				<CommentForm />
+				{comments.map((comment) => {
+					return (
+						<div key={comment.id}>
+							<p>
+								{comment.text}
+								<br />
+								-- {comment.author},{" "}
+								{new Intl.DateTimeFormat("en-US", {
+									year: "numeric",
+									month: "short",
+									day: "2-digit",
+								}).format(new Date(Date.parse(comment.date)))}
+							</p>
+						</div>
+					);
+				})}
+				<CommentForm campsiteId={campsiteId} addComment={addComment} />
 			</div>
 		);
 	}
-	return <div />
+	return <div />;
 }
 
 function CampsiteInfo(props) {
 	if (props.campsite) {
         return (
-			<div className='container'>
-				<div className='row'>
-					<div className='col'>
-						<Breadcrumb>
-							<BreadcrumbItem><Link to='/directory'>Directory</Link></BreadcrumbItem>
-							<BreadcrumbItem active>{props.campsite.name}</BreadcrumbItem>
-						</Breadcrumb>
-						<h2>{props.campsite.name}</h2>
-						<hr />
+					<div className='container'>
+						<div className='row'>
+							<div className='col'>
+								<Breadcrumb>
+									<BreadcrumbItem>
+										<Link to='/directory'>Directory</Link>
+									</BreadcrumbItem>
+									<BreadcrumbItem active>{props.campsite.name}</BreadcrumbItem>
+								</Breadcrumb>
+								<h2>{props.campsite.name}</h2>
+								<hr />
+							</div>
+						</div>
+						<div className='row'>
+							<RenderCampsite campsite={props.campsite} />
+							<RenderComments
+								comments={props.comments}
+								addComment={props.addComment}
+								campsiteId={props.campsite.id}
+							/>
+						</div>
 					</div>
-				</div>
-				<div className='row'>
-					<RenderCampsite campsite={props.campsite} />
-					<RenderComments comments={props.comments} />
-				</div>
-			</div>
-		);
+				);
 	}
 	return <div />;		
 }
