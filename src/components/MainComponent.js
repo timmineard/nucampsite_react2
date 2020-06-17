@@ -9,7 +9,12 @@ import About from "./AboutComponent";
 import { Switch, Route, Redirect, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { actions } from "react-redux-form";
-import { addComment, fetchCampsites } from "../redux/ActionCreators";
+import {
+	addComment,
+	fetchCampsites,
+	fetchComments,
+	fetchPromotions,
+} from "../redux/ActionCreators";
 
 const mapStateToProps = (state) => {
 	return {
@@ -25,13 +30,16 @@ const mapDispatchToProps = {
 		addComment(campsiteId, rating, author, text),
 	fetchCampsites: () => fetchCampsites(),
 	resetFeedbackForm: () => actions.reset("feedbackForm"),
+	fetchComments: () => fetchComments(),
+	fetchPromotions: () => fetchPromotions(),
 };
 
 class Main extends Component {
 	componentDidMount() {
 		this.props.fetchCampsites();
+		this.props.fetchComments();
+		this.props.fetchPromotions();
 	}
-
 	render() {
 		const HomePage = () => {
 			return (
@@ -43,10 +51,14 @@ class Main extends Component {
 					}
 					campsitesLoading={this.props.campsites.isLoading}
 					campsitesErrMess={this.props.campsites.errMess}
-					promotion={
-						this.props.promotions.filter((promotion) => promotion.featured)[0]
-					}
 					partner={this.props.partners.filter((partner) => partner.featured)[0]}
+					promotion={
+						this.props.promotions.promotions.filter(
+							(promotion) => promotion.featured
+						)[0]
+					}
+					promotionLoading={this.props.promotions.isLoading}
+					promotionErrMess={this.props.promotions.errMess}
 				/>
 			);
 		};
@@ -61,9 +73,10 @@ class Main extends Component {
 					}
 					isLoading={this.props.campsites.isLoading}
 					errMess={this.props.campsites.errMess}
-					comments={this.props.comments.filter(
+					comments={this.props.comments.comments.filter(
 						(comment) => comment.campsiteId === +match.params.campsiteId
 					)}
+					commentsErrMess={this.props.comments.errMess}
 					addComment={this.props.addComment}
 				/>
 			);
@@ -80,7 +93,12 @@ class Main extends Component {
 						render={() => <Directory campsites={this.props.campsites} />}
 					/>
 					<Route path='/directory/:campsiteId' component={CampsiteWithId} />
-					<Route exact path='/contactus' render={() => (<Contact resetFeedbackForm={this.props.resetFeedbackForm} />)}
+					<Route
+						exact
+						path='/contactus'
+						render={() => (
+							<Contact resetFeedbackForm={this.props.resetFeedbackForm} />
+						)}
 					/>
 					<Route
 						exact
