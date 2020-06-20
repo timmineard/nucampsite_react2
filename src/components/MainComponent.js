@@ -14,6 +14,8 @@ import {
 	fetchCampsites,
 	fetchComments,
 	fetchPromotions,
+	fetchPartners,
+	postFeedback
 } from "../redux/ActionCreators";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
@@ -33,13 +35,19 @@ const mapDispatchToProps = {
 	resetFeedbackForm: () => actions.reset("feedbackForm"),
 	fetchComments: () => fetchComments(),
 	fetchPromotions: () => fetchPromotions(),
+	fetchPartners: () => fetchPartners(),
+	postFeedback: (feedback) => postFeedback(feedback)
 };
 
 class Main extends Component {
+	constructor(props) {
+		super(props);
+	}
 	componentDidMount() {
 		this.props.fetchCampsites();
 		this.props.fetchComments();
 		this.props.fetchPromotions();
+		this.props.fetchPartners();
 	}
 	render() {
 		const HomePage = () => {
@@ -52,7 +60,15 @@ class Main extends Component {
 					}
 					campsitesLoading={this.props.campsites.isLoading}
 					campsitesErrMess={this.props.campsites.errMess}
-					partner={this.props.partners.filter((partner) => partner.featured)[0]}
+					partner= {
+						this.props.partners.partners.filter(
+							(partner) => partner.featured
+						)[0]
+					}
+
+					partnerLoading={this.props.partners.isLoading}
+					partnerErrMess={this.props.partners.errMess}
+
 					promotion={
 						this.props.promotions.promotions.filter(
 							(promotion) => promotion.featured
@@ -103,13 +119,13 @@ class Main extends Component {
 								exact
 								path='/contactus'
 								render={() => (
-									<Contact resetFeedbackForm={this.props.resetFeedbackForm} />
+									<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback} />
 								)}
 							/>
 							<Route
 								exact
 								path='/aboutus'
-								render={() => <About partners={this.props.partners} />}
+								render={() => <About partners={this.props.partners.partners} />}
 							/>
 							<Redirect to='/home' />
 						</Switch>
